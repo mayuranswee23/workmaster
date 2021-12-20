@@ -51,14 +51,16 @@ $(".list-group").on("click", "p", function(){
   var textInput = $("<textarea>").addClass("form-control").val(text);
   $(this).replaceWith(textInput);
   textInput.trigger("focus")
+  
 })
 
 $(".list-group").on("blur", "textarea", function(){
+
 //obtain the textarea current value/text
 var text = $(this).val().trim();
 
 // get parent ul ID attribute
-var status = $(this).closest("list-group").attr("id").replace("list-", "")
+var status = $(this).closest(".list-group").attr("id").replace("list-", "")
 
 //get the task position in the list of other li elements
 var index = $(this).closest(".list-group-item").index();
