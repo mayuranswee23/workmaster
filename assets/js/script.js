@@ -232,6 +232,13 @@ var auditTask = function (taskEl){
 }
 }
 
+//setInterval to refresh the page to identify pending tasks
+setInterval(function () {
+  $(".card .list-group-item").each(function(index, el) {
+    auditTask(el);
+  });
+}, (1000 * 60) * 30);
+
 // modal was triggered
 $("#task-form-modal").on("show.bs.modal", function() {
   // clear values
