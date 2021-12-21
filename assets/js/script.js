@@ -13,6 +13,8 @@ var createTask = function(taskText, taskDate, taskList) {
   // append span and p element to parent li
   taskLi.append(taskSpan, taskP);
 
+  //check due date
+  auditTask(taskLi)
 
   // append to ul list on the page
   $("#list-" + taskList).append(taskLi);
@@ -160,11 +162,20 @@ $(".list-group").on("click", "span", function() {
   // swap out elements
   $(this).replaceWith(dateInput);
 
+  //enable jQuery UI datepicker
+  dateInput.datepicker({
+    minDate: 1, 
+    onClose: function(){
+      //when the calender is closed, forse a change event on the dateInput
+      $(this).trigger("change");
+    }
+  });
+
   // automatically focus on new element
   dateInput.trigger("focus");
 })
 // value of due date was changed
-$(".list-group").on("blur", "input[type='text']", function() {
+$(".list-group").on("change", "input[type='text']", function() {
   // get current text
   var date = $(this)
     .val()
@@ -192,7 +203,34 @@ $(".list-group").on("blur", "input[type='text']", function() {
 
   // replace input with span element
   $(this).replaceWith(taskSpan);
+
+   // Pass task's <li> element into auditTask() to check new due date
+   auditTask($(taskSpan).closest(".list-group-item"));
 });
+
+//to check when the task is due and to alert the user the date is close
+var auditTask = function (taskEl){
+  //get task from task element from createTask()
+  var date = $(taskEl).find("span").text().trim();
+  //ensure it works
+  console.log(date)
+
+  //convert to moment object at 5:00pm
+  var time = moment(date, "L").set("hour", 17)
+  // this should print out an object for the value of the date variable, but at 5:00pm of that date
+  console.log(time)
+
+  // remove any old classes from element
+  $(taskEl).removeClass("list-group-item-warning list-group-item-danger");
+
+  // apply new class if task is near/over due date
+  if (moment().isAfter(time)) {
+    $(taskEl).addClass("list-group-item-danger");
+  }
+  else if (Math.abs(moment().diff(time, "days")) <= 2) {
+    $(taskEl).addClass("list-group-item-warning");
+}
+}
 
 // modal was triggered
 $("#task-form-modal").on("show.bs.modal", function() {
@@ -226,6 +264,11 @@ $("#task-form-modal .btn-primary").click(function() {
 
     saveTasks();
   }
+});
+
+//to use a datepicker on the modal 
+$("#modalDueDate").datepicker({
+  minDate: 1
 });
 
 // remove all tasks
